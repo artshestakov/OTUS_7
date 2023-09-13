@@ -27,12 +27,13 @@ private:
     //! \param command команда
     void AddCommand(const std::string& command);
 
-    //! Распечатать накопленные команды на консоль
-    void PrintVector();
+    //! Распечатать накопленные команды на консоль и очистить память
+    void PrintAndClearVector();
 
 private:
     std::string m_ErrorString;
     unsigned int m_BlockCount;
+    int m_BlockDepth;
     std::vector<std::string> m_Vector;
 };
 //-----------------------------------------------------------------------------

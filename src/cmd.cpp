@@ -2,7 +2,8 @@
 #include <iostream>
 //-----------------------------------------------------------------------------
 cmd::cmd()
-    : m_BlockCount(0)
+    : m_BlockCount(0),
+    m_BlockDepth(0)
 {
 
 }
@@ -52,14 +53,49 @@ bool cmd::ParseArgument(int argc, char** argv)
 //-----------------------------------------------------------------------------
 void cmd::ReadConsole()
 {
+    std::cout << "Enter the \"\\q\" command for exit." << std::endl << std::endl;
+
     std::string command;
     while (std::getline(std::cin, command))
     {
-        AddCommand(command);
-        if (m_Vector.size() == m_BlockCount || command.empty())
+        if (command == "{")
         {
-            PrintVector();
-            m_Vector.clear();
+            if (!m_Vector.empty() && m_BlockDepth == 0)
+            {
+                PrintAndClearVector();
+            }
+
+            ++m_BlockDepth;
+            continue; //Не допускаем лишней проверки внизу цикла
+        }
+        else if (command == "}")
+        {
+            --m_BlockDepth;
+            if (m_BlockDepth == 0)
+            {
+                PrintAndClearVector();
+            }
+            continue; //Не допускаем лишней проверки внизу цикла
+        }
+        else if (m_BlockDepth > 0 && command.empty())
+        {
+            PrintAndClearVector();
+            m_BlockDepth = 0;
+            continue; //Не допускаем лишней проверки внизу цикла
+        }
+        else if (command == "\\q") //Не забываем про корректный выход из программы
+        {
+            std::cout << "The program will be closed" << std::endl;
+            break;
+        }
+        else //Считаем что пришла стандартная команда
+        {
+            AddCommand(command);
+        }
+
+        if (m_BlockDepth == 0 && (m_Vector.size() == m_BlockCount || command.empty()))
+        {
+            PrintAndClearVector();
         }
     }
 }
@@ -72,7 +108,7 @@ void cmd::AddCommand(const std::string& command)
     }
 }
 //-----------------------------------------------------------------------------
-void cmd::PrintVector()
+void cmd::PrintAndClearVector()
 {
     std::cout << "Commands: ";
     for (const std::string& s : m_Vector)
@@ -80,9 +116,11 @@ void cmd::PrintVector()
         std::cout << s;
         if (s != m_Vector.back())
         {
-            std::cout << " ";
+            std::cout << ", ";
         }
     }
     std::cout << std::endl;
+
+    m_Vector.clear();
 }
 //-----------------------------------------------------------------------------
