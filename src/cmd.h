@@ -2,6 +2,8 @@
 //-----------------------------------------------------------------------------
 #include <string>
 #include <vector>
+#include <chrono>
+#include <optional>
 //-----------------------------------------------------------------------------
 class cmd
 {
@@ -30,10 +32,15 @@ private:
     //! Распечатать накопленные команды на консоль и очистить память
     void PrintAndClearVector();
 
+    //! Запись строки в файл
+    //! \param s строка, которая будет записана в файл
+    void WriteFile(const std::string& s);
+
 private:
     std::string m_ErrorString;
     unsigned int m_BlockCount;
     int m_BlockDepth;
     std::vector<std::string> m_Vector;
+    std::optional<std::chrono::system_clock::time_point> m_Time;
 };
 //-----------------------------------------------------------------------------

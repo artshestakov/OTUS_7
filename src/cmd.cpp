@@ -1,5 +1,8 @@
 #include "cmd.h"
 #include <iostream>
+#include <sstream>
+#include <filesystem>
+#include <fstream>
 //-----------------------------------------------------------------------------
 cmd::cmd()
     : m_BlockCount(0),
@@ -105,22 +108,51 @@ void cmd::AddCommand(const std::string& command)
     if (!command.empty())
     {
         m_Vector.emplace_back(command);
+
+        if (!m_Time.has_value())
+        {
+            m_Time = std::chrono::system_clock::now();
+        }
     }
 }
 //-----------------------------------------------------------------------------
 void cmd::PrintAndClearVector()
 {
-    std::cout << "Commands: ";
+    std::stringstream str_stream;
+
+    str_stream << "bulk: ";
     for (const std::string& s : m_Vector)
     {
-        std::cout << s;
+        str_stream << s;
         if (s != m_Vector.back())
         {
-            std::cout << ", ";
+            str_stream << ", ";
         }
     }
-    std::cout << std::endl;
+    str_stream << std::endl;
+
+    std::string str = str_stream.str();
+
+    std::cout << str;
+    WriteFile(str);
 
     m_Vector.clear();
+    m_Time = std::nullopt;
+}
+//-----------------------------------------------------------------------------
+void cmd::WriteFile(const std::string& s)
+{
+    auto time_sec = std::chrono::duration_cast<std::chrono::seconds>(m_Time.value().time_since_epoch());
+
+    std::string file_name = "bulk" + std::to_string(time_sec.count()) + ".log";
+    std::ofstream file(file_name);
+    if (!file.is_open())
+    {
+        std::cout << "Can't write file " + file_name;
+        return;
+    }
+
+    file << s;
+    file.close();
 }
 //-----------------------------------------------------------------------------
