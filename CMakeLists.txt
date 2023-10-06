@@ -6,7 +6,10 @@ set (CMAKE_CXX_STANDARD 17)
 
 add_executable(bulk
     src/main.cpp
-	src/cmd.cpp
+    src/cmd.cpp
+    src/writers.cpp
+    src/observer.h
+    src/stdafx.h
 )
 
 target_include_directories(bulk
