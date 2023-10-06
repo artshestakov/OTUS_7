@@ -1,4 +1,4 @@
-#include "Writers.h"
+#include "writers.h"
 //-----------------------------------------------------------------------------
 WriterFile::WriterFile(Observable* c)
 {

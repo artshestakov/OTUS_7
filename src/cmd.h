@@ -1,7 +1,7 @@
 #pragma once
 //-----------------------------------------------------------------------------
-#include "Observer.h"
-#include "Writers.h"
+#include "observer.h"
+#include "writers.h"
 //-----------------------------------------------------------------------------
 class cmd : public Observable
 {
