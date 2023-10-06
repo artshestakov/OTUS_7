@@ -1,15 +1,17 @@
 #pragma once
 //-----------------------------------------------------------------------------
-#include <string>
-#include <vector>
-#include <chrono>
-#include <optional>
+#include "observer.h"
+#include "writers.h"
 //-----------------------------------------------------------------------------
-class cmd
+class cmd : public Observable
 {
 public:
     cmd();
     ~cmd();
+
+    //! Подписка на события
+    //! \param object подписчик
+    void Subscribe(Observer* object) override;
 
     //! Получить текстовое описание последней ошибки
     //! \return возвращает текстовое описание последней ошибки
@@ -32,9 +34,9 @@ private:
     //! Распечатать накопленные команды на консоль и очистить память
     void PrintAndClearVector();
 
-    //! Запись строки в файл
-    //! \param s строка, которая будет записана в файл
-    void WriteFile(const std::string& s);
+    //! Издать сигнал
+    //! \param s строка
+    void Notify(const std::string& s);
 
 private:
     std::string m_ErrorString;
@@ -42,5 +44,6 @@ private:
     int m_BlockDepth;
     std::vector<std::string> m_Vector;
     std::optional<std::chrono::system_clock::time_point> m_Time;
+    std::vector<Observer*> m_Subscribers;
 };
 //-----------------------------------------------------------------------------

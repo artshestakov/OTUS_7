@@ -1,8 +1,4 @@
 #include "cmd.h"
-#include <iostream>
-#include <sstream>
-#include <filesystem>
-#include <fstream>
 //-----------------------------------------------------------------------------
 cmd::cmd()
     : m_BlockCount(0),
@@ -14,6 +10,11 @@ cmd::cmd()
 cmd::~cmd()
 {
 
+}
+//-----------------------------------------------------------------------------
+void cmd::Subscribe(Observer* object)
+{
+    m_Subscribers.emplace_back(object);
 }
 //-----------------------------------------------------------------------------
 const std::string& cmd::GetErrorString() const
@@ -121,38 +122,28 @@ void cmd::PrintAndClearVector()
     std::stringstream str_stream;
 
     str_stream << "bulk: ";
-    for (const std::string& s : m_Vector)
+    for (size_t i = 0, c = m_Vector.size(); i < c; ++i)
     {
+        const std::string& s = m_Vector[i];
         str_stream << s;
-        if (s != m_Vector.back())
+        if (i != c - 1)
         {
             str_stream << ", ";
         }
     }
     str_stream << std::endl;
 
-    std::string str = str_stream.str();
-
-    std::cout << str;
-    WriteFile(str);
+    Notify(str_stream.str());
 
     m_Vector.clear();
     m_Time = std::nullopt;
 }
 //-----------------------------------------------------------------------------
-void cmd::WriteFile(const std::string& s)
+void cmd::Notify(const std::string& s)
 {
-    auto time_sec = std::chrono::duration_cast<std::chrono::seconds>(m_Time.value().time_since_epoch());
-
-    std::string file_name = "bulk" + std::to_string(time_sec.count()) + ".log";
-    std::ofstream file(file_name);
-    if (!file.is_open())
+    for (auto subscriber : m_Subscribers)
     {
-        std::cout << "Can't write file " + file_name;
-        return;
+        subscriber->Update(s, m_Time.value());
     }
-
-    file << s;
-    file.close();
 }
 //-----------------------------------------------------------------------------

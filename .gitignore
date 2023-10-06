@@ -4,3 +4,4 @@
 /msvc/.vs
 
 *.vcxproj.user
+*.log
